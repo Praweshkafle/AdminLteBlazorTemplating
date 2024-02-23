@@ -1,6 +1,9 @@
 ﻿@page "/dummyjson"
+@attribute [Authorize]
+
 @using BlazorTemplating.Models
 @using System.Text.Json
+@using Microsoft.AspNetCore.Authorization
 
 <table class="table">
     <thead>

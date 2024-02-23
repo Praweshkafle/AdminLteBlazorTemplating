@@ -1,4 +1,7 @@
-﻿<!-- Navbar -->
+﻿@using Blazored.LocalStorage
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService _localStorage;
+<!-- Navbar -->
 <nav class="main-header navbar navbar-expand navbar-white navbar-light">
     <!-- Left navbar links -->
     <ul class="navbar-nav">
@@ -13,6 +16,8 @@
         </li>
     </ul>
 
+    <button type="button" class="btn btn-primary btn-block" style="width:100px;" @onclick="Logout">Log out</button>
+
     <!-- SEARCH FORM -->
     <form class="form-inline ml-3">
         <div class="input-group input-group-sm">
@@ -24,9 +29,10 @@
             </div>
         </div>
     </form>
-
+    
     <!-- Right navbar links -->
     <ul class="navbar-nav ml-auto">
+
         <!-- Messages Dropdown Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link" data-toggle="dropdown" href="#">
@@ -81,8 +87,6 @@
                     </div>
                     <!-- Message End -->
                 </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item dropdown-footer">See All Messages</a>
             </div>
         </li>
         <!-- Notifications Dropdown Menu -->
@@ -158,5 +162,11 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+    private void Logout()
+    {
+        _localStorage.RemoveItemAsync("Authorized");
+
+        NavigationManager.NavigateTo("/login");
     }
 }

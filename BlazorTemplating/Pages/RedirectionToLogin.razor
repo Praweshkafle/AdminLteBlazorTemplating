@@ -1,0 +1,14 @@
+﻿@using Blazored.LocalStorage
+<h3>RedirectionToLogin</h3>
+@inject NavigationManager navManager;
+@inject ILocalStorageService _localStorage;
+@code {
+    protected async override void OnInitialized()
+    {
+        var isAuthenticated = await _localStorage.ContainKeyAsync("Authorized");
+        if (!isAuthenticated)
+        {
+            navManager.NavigateTo("/login");
+        }
+    }
+}
