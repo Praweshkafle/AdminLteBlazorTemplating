@@ -1,0 +1,88 @@
+﻿@page "/dummyjson"
+@using BlazorTemplating.Models
+@using System.Text.Json
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Price</th>
+            <th>Discount Percentage</th>
+            <th>Rating</th>
+            <th>Stock</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Thumbnail</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Products)
+        {
+            <tr>
+                <td>@product.id</td>
+                <td>@product.title</td>
+                <td>@product.description</td>
+                <td>@product.price</td>
+                <td>@product.discountPercentage</td>
+                <td>@product.rating</td>
+                <td>@product.stock</td>
+                <td>@product.brand</td>
+                <td>@product.category</td>
+                <td><img src="@product.thumbnail" alt="Thumbnail" style="max-width: 100px;" /></td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button disabled="@(_skip == 0)" @onclick="PreviousPage">Previous</button>
+<button disabled="@(!_hasMoreResults)" @onclick="NextPage">Next</button>
+
+@code {
+    [Inject]
+    private HttpClient _httpClient { get; set; }
+    private int _skip = 0;
+    private const int PageSize = 10;
+    private bool _hasMoreResults = true;
+    public List<Product> Products=new List<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducts();
+    }
+    private async Task LoadProducts()
+    {
+        var response = await GetProducts(PageSize, _skip);
+        Products = response.products;
+        _hasMoreResults = Products.Count == PageSize;
+    }
+    private async Task<Response> GetProducts(int limit, int skip)
+    {
+        var response = await _httpClient.GetAsync($"https://dummyjson.com/products?skip={skip}&limit={limit}");
+        if (response.IsSuccessStatusCode)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            var result= JsonSerializer.Deserialize<Response>(content);
+            return result;
+        }
+        else
+        {
+            return new Response(); 
+        }
+    }
+
+    private async Task PreviousPage()
+    {
+        _skip -= PageSize;
+        if (_skip < 0)
+            _skip = 0;
+        await LoadProducts();
+    }
+
+    private async Task NextPage()   
+    {
+        _skip += PageSize;
+        await LoadProducts();
+    }
+
+}
